@@ -3357,7 +3357,13 @@ static void Cmd_getexp(void)
             else
             {
                 // music change in wild battle after fainting a poke
-                if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && gBattleMons[0].hp != 0 && !gBattleStruct->wildVictorySong)
+                // Play wild victory music only after the final opponent is defeated.
+                if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+                    && gBattleMons[0].hp != 0
+                    && !gBattleStruct->wildVictorySong
+                    && (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+                    || ((gBattleStruct->givenExpMons & gBitTable[gBattlerPartyIndexes[1]])
+                     && (gBattleStruct->givenExpMons & gBitTable[gBattlerPartyIndexes[3]]))))
                 {
                     BattleStopLowHpSound();
                     PlayBGM(MUS_VICTORY_WILD);
@@ -9927,12 +9933,29 @@ static void Cmd_handleballthrow(void)
     else
     {
         u32 odds;
-        u8 catchRate;
+        s32 catchRate;
+        s32 initialSafariFactor;
 
         if (gLastUsedItem == ITEM_SAFARI_BALL)
-            catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
-        else
-            catchRate = gSpeciesInfo[gBattleMons[gBattlerTarget].species].catchRate;
+{
+    catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
+}
+    else
+    {
+        catchRate = gSpeciesInfo[gBattleMons[gBattlerTarget].species].catchRate;
+
+    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
+    {
+        initialSafariFactor = catchRate * 100 / 1275;
+
+        catchRate += (gBattleStruct->safariCatchFactor - initialSafariFactor) * 1275 / 100;
+
+        if (catchRate < 1)
+            catchRate = 1;
+        if (catchRate > 255)
+            catchRate = 255;
+    }
+}
 
         if (gLastUsedItem > ITEM_SAFARI_BALL)
         {
@@ -10006,7 +10029,9 @@ static void Cmd_handleballthrow(void)
             }
         }
 
-        if (odds > 254) // mon caught
+        if (odds > 254
+            || ((gBattleTypeFlags & BATTLE_TYPE_SAFARI)
+                && gSpeciesInfo[gBattleMons[gBattlerTarget].species].catchRate == 255))
         {
             BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_3_SHAKES_SUCCESS);
             MarkBattlerForControllerExec(gActiveBattler);

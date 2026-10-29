@@ -3306,6 +3306,9 @@ const union {
     } },
 
     [SPECIES_MAGIKARP] = { .learnset = {
+        .SURF = TRUE,
+        .WATERFALL = TRUE,
+        .DIVE = TRUE,
     } },
 
     [SPECIES_GYARADOS] = { .learnset = {

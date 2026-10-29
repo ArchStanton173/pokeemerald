@@ -388,10 +388,22 @@ static void CreateBattleStartTask(u8 transition, u16 song)
 
 void BattleSetup_StartWildBattle(void)
 {
-    if (GetSafariZoneFlag())
+    if (GetSafariZoneFlag() || CalculatePlayerPartyCount() == 0)
         DoSafariBattle();
     else
         DoStandardWildBattle();
+}
+
+void BattleSetup_StartDoubleWildBattle(void)
+{
+    if (GetSafariZoneFlag() || CalculatePlayerPartyCount() < 2)
+    {
+        BattleSetup_StartWildBattle();
+        return;
+    }
+
+    DoStandardWildBattle();
+    gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;
 }
 
 void BattleSetup_StartBattlePikeWildBattle(void)
@@ -437,7 +449,13 @@ static void DoSafariBattle(void)
     LockPlayerFieldControls();
     FreezeObjectEvents();
     StopPlayerAvatar();
-    gMain.savedCallback = CB2_EndSafariBattle;
+
+    if (!GetSafariZoneFlag())
+        gNumSafariBalls = 10;
+
+    gMain.savedCallback = GetSafariZoneFlag()
+                    ? CB2_EndSafariBattle
+                    : CB2_EndWildBattle;
     gBattleTypeFlags = BATTLE_TYPE_SAFARI;
     CreateBattleStartTask(GetWildBattleTransition(), 0);
 }

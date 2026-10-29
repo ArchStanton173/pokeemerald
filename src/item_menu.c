@@ -570,6 +570,15 @@ void CB2_BagMenuFromBattle(void)
         GoToBattlePyramidBagMenu(PYRAMIDBAG_LOC_BATTLE, CB2_SetUpReshowBattleScreenAfterMenu2);
 }
 
+void CB2_BagMenuFromSafariBattle(void)
+{
+    GoToBagMenu(
+        ITEMMENULOCATION_BATTLE,
+        BALLS_POCKET,
+        CB2_SetUpReshowBattleScreenAfterMenu2
+    );
+}
+
 // Choosing berry to plant
 void CB2_ChooseBerry(void)
 {
@@ -628,7 +637,9 @@ void GoToBagMenu(u8 location, u8 pocket, MainCallback exitCallback)
         if (pocket < POCKETS_COUNT)
             gBagPosition.pocket = pocket;
         if (gBagPosition.location == ITEMMENULOCATION_BERRY_TREE ||
-            gBagPosition.location == ITEMMENULOCATION_BERRY_BLENDER_CRUSH)
+            gBagPosition.location == ITEMMENULOCATION_BERRY_BLENDER_CRUSH ||
+            (gBagPosition.location == ITEMMENULOCATION_BATTLE &&
+            (gBattleTypeFlags & BATTLE_TYPE_SAFARI)))
             gBagMenu->pocketSwitchDisabled = TRUE;
         gBagMenu->newScreenCallback = NULL;
         gBagMenu->toSwapPos = NOT_SWAPPING;

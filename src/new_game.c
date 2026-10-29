@@ -1,3 +1,4 @@
+#include "constants/heal_locations.h"
 #include "global.h"
 #include "new_game.h"
 #include "random.h"
@@ -96,6 +97,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SHIFT;
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
+    gSaveBlock2Ptr->optionsCursorMemoryOff = FALSE;
 }
 
 static void ClearPokedexFlags(void)
@@ -124,9 +126,13 @@ static void ClearFrontierRecord(void)
     gSaveBlock2Ptr->frontier.opponentNames[1][0] = EOS;
 }
 
-static void WarpToTruck(void)
+//Warps the player to Dewford upon new game
+static void WarpToDewford(void)
 {
-    SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(MAP_DEWFORD_TOWN),
+                       MAP_NUM(MAP_DEWFORD_TOWN),
+                       WARP_ID_NONE,
+                       9, 10);
     WarpIntoMap();
 }
 
@@ -169,7 +175,7 @@ void NewGameInitData(void)
     ResetGabbyAndTy();
     ClearSecretBases();
     ClearBerryTrees();
-    SetMoney(&gSaveBlock1Ptr->money, 3000);
+    SetMoney(&gSaveBlock1Ptr->money, 200);
     SetCoins(0);
     ResetLinkContestBoolean();
     ResetGameStats();
@@ -192,7 +198,8 @@ void NewGameInitData(void)
     InitDewfordTrend();
     ResetFanClub();
     ResetLotteryCorner();
-    WarpToTruck();
+    WarpToDewford();
+    SetLastHealLocationWarp(HEAL_LOCATION_DEWFORD_TOWN);
     RunScriptImmediately(EventScript_ResetAllMapFlags);
     ResetMiniGamesRecords();
     InitUnionRoomChatRegisteredTexts();

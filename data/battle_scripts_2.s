@@ -186,8 +186,6 @@ BattleScript_ActionThrowPokeblock:
 	printstring STRINGID_THREWPOKEBLOCKATPKMN
 	waitmessage B_WAIT_TIME_LONG
 	playanimation BS_ATTACKER, B_ANIM_POKEBLOCK_THROW, NULL
-	printfromtable gSafariPokeblockResultStringIds
-	waitmessage B_WAIT_TIME_LONG
 	end2
 
 BattleScript_ActionWallyThrow:

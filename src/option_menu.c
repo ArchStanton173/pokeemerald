@@ -23,6 +23,7 @@
 #define tSound data[4]
 #define tButtonMode data[5]
 #define tWindowFrameType data[6]
+#define tCursorMemoryOff data[7]
 
 enum
 {
@@ -32,6 +33,7 @@ enum
     MENUITEM_SOUND,
     MENUITEM_BUTTONMODE,
     MENUITEM_FRAMETYPE,
+    MENUITEM_CURSORMEMORY,
     MENUITEM_CANCEL,
     MENUITEM_COUNT,
 };
@@ -42,12 +44,13 @@ enum
     WIN_OPTIONS
 };
 
-#define YPOS_TEXTSPEED    (MENUITEM_TEXTSPEED * 16)
-#define YPOS_BATTLESCENE  (MENUITEM_BATTLESCENE * 16)
-#define YPOS_BATTLESTYLE  (MENUITEM_BATTLESTYLE * 16)
-#define YPOS_SOUND        (MENUITEM_SOUND * 16)
-#define YPOS_BUTTONMODE   (MENUITEM_BUTTONMODE * 16)
-#define YPOS_FRAMETYPE    (MENUITEM_FRAMETYPE * 16)
+#define YPOS_TEXTSPEED    (MENUITEM_TEXTSPEED * 14)
+#define YPOS_BATTLESCENE  (MENUITEM_BATTLESCENE * 14)
+#define YPOS_BATTLESTYLE  (MENUITEM_BATTLESTYLE * 14)
+#define YPOS_SOUND        (MENUITEM_SOUND * 14)
+#define YPOS_BUTTONMODE   (MENUITEM_BUTTONMODE * 14)
+#define YPOS_FRAMETYPE    (MENUITEM_FRAMETYPE * 14)
+#define YPOS_CURSORMEMORY (MENUITEM_CURSORMEMORY * 14)
 
 static void Task_OptionMenuFadeIn(u8 taskId);
 static void Task_OptionMenuProcessInput(u8 taskId);
@@ -64,6 +67,8 @@ static u8 Sound_ProcessInput(u8 selection);
 static void Sound_DrawChoices(u8 selection);
 static u8 FrameType_ProcessInput(u8 selection);
 static void FrameType_DrawChoices(u8 selection);
+static u8 CursorMemory_ProcessInput(u8 selection);
+static void CursorMemory_DrawChoices(u8 selection);
 static u8 ButtonMode_ProcessInput(u8 selection);
 static void ButtonMode_DrawChoices(u8 selection);
 static void DrawHeaderText(void);
@@ -76,6 +81,10 @@ static const u16 sOptionMenuText_Pal[] = INCGFX_U16("graphics/interface/option_m
 // note: this is only used in the Japanese release
 static const u8 sEqualSignGfx[] = INCGFX_U8("graphics/interface/option_menu_equals_sign.png", ".4bpp");
 
+static const u8 sText_CursorMemory[] = _("CURSOR MEMORY");
+static const u8 sText_CursorMemoryOn[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
+static const u8 sText_CursorMemoryOff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
+
 static const u8 *const sOptionMenuItemsNames[MENUITEM_COUNT] =
 {
     [MENUITEM_TEXTSPEED]   = gText_TextSpeed,
@@ -84,6 +93,7 @@ static const u8 *const sOptionMenuItemsNames[MENUITEM_COUNT] =
     [MENUITEM_SOUND]       = gText_Sound,
     [MENUITEM_BUTTONMODE]  = gText_ButtonMode,
     [MENUITEM_FRAMETYPE]   = gText_Frame,
+    [MENUITEM_CURSORMEMORY] = sText_CursorMemory,
     [MENUITEM_CANCEL]      = gText_OptionMenuCancel,
 };
 
@@ -234,6 +244,7 @@ void CB2_InitOptionMenu(void)
         gTasks[taskId].tSound = gSaveBlock2Ptr->optionsSound;
         gTasks[taskId].tButtonMode = gSaveBlock2Ptr->optionsButtonMode;
         gTasks[taskId].tWindowFrameType = gSaveBlock2Ptr->optionsWindowFrameType;
+        gTasks[taskId].tCursorMemoryOff = gSaveBlock2Ptr->optionsCursorMemoryOff;
 
         TextSpeed_DrawChoices(gTasks[taskId].tTextSpeed);
         BattleScene_DrawChoices(gTasks[taskId].tBattleSceneOff);
@@ -241,6 +252,7 @@ void CB2_InitOptionMenu(void)
         Sound_DrawChoices(gTasks[taskId].tSound);
         ButtonMode_DrawChoices(gTasks[taskId].tButtonMode);
         FrameType_DrawChoices(gTasks[taskId].tWindowFrameType);
+        CursorMemory_DrawChoices(gTasks[taskId].tCursorMemoryOff);
         HighlightOptionMenuItem(gTasks[taskId].tMenuSelection);
 
         CopyWindowToVram(WIN_OPTIONS, COPYWIN_FULL);
@@ -336,6 +348,14 @@ static void Task_OptionMenuProcessInput(u8 taskId)
             if (previousOption != gTasks[taskId].tWindowFrameType)
                 FrameType_DrawChoices(gTasks[taskId].tWindowFrameType);
             break;
+        case MENUITEM_CURSORMEMORY:
+            previousOption = gTasks[taskId].tCursorMemoryOff;
+            gTasks[taskId].tCursorMemoryOff =
+            CursorMemory_ProcessInput(gTasks[taskId].tCursorMemoryOff);
+
+    if (previousOption != gTasks[taskId].tCursorMemoryOff)
+        CursorMemory_DrawChoices(gTasks[taskId].tCursorMemoryOff);
+    break;
         default:
             return;
         }
@@ -356,6 +376,7 @@ static void Task_OptionMenuSave(u8 taskId)
     gSaveBlock2Ptr->optionsSound = gTasks[taskId].tSound;
     gSaveBlock2Ptr->optionsButtonMode = gTasks[taskId].tButtonMode;
     gSaveBlock2Ptr->optionsWindowFrameType = gTasks[taskId].tWindowFrameType;
+    gSaveBlock2Ptr->optionsCursorMemoryOff = gTasks[taskId].tCursorMemoryOff;
 
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
     gTasks[taskId].func = Task_OptionMenuFadeOut;
@@ -374,7 +395,7 @@ static void Task_OptionMenuFadeOut(u8 taskId)
 static void HighlightOptionMenuItem(u8 index)
 {
     SetGpuReg(REG_OFFSET_WIN0H, WIN_RANGE(16, DISPLAY_WIDTH - 16));
-    SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(index * 16 + 40, index * 16 + 56));
+    SetGpuReg(REG_OFFSET_WIN0V, WIN_RANGE(index * 14 + 40, index * 14 + 54));
 }
 
 static void DrawOptionMenuChoice(const u8 *text, u8 x, u8 y, u8 style)
@@ -462,6 +483,34 @@ static void BattleScene_DrawChoices(u8 selection)
 
     DrawOptionMenuChoice(gText_BattleSceneOn, 104, YPOS_BATTLESCENE, styles[0]);
     DrawOptionMenuChoice(gText_BattleSceneOff, GetStringRightAlignXOffset(FONT_NORMAL, gText_BattleSceneOff, 198), YPOS_BATTLESCENE, styles[1]);
+}
+
+static u8 CursorMemory_ProcessInput(u8 selection)
+{
+    if (JOY_NEW(DPAD_LEFT | DPAD_RIGHT))
+    {
+        selection ^= 1;
+        sArrowPressed = TRUE;
+    }
+
+    return selection;
+}
+
+static void CursorMemory_DrawChoices(u8 selection)
+{
+    u8 styles[2];
+
+    styles[0] = 0;
+    styles[1] = 0;
+    styles[selection] = 1;
+
+    DrawOptionMenuChoice(sText_CursorMemoryOn, 104, YPOS_CURSORMEMORY, styles[0]);
+    DrawOptionMenuChoice(
+        sText_CursorMemoryOff,
+        GetStringRightAlignXOffset(FONT_NORMAL, sText_CursorMemoryOff, 198),
+        YPOS_CURSORMEMORY,
+        styles[1]
+    );
 }
 
 static u8 BattleStyle_ProcessInput(u8 selection)
@@ -628,7 +677,7 @@ static void DrawOptionMenuTexts(void)
 
     FillWindowPixelBuffer(WIN_OPTIONS, PIXEL_FILL(1));
     for (i = 0; i < MENUITEM_COUNT; i++)
-        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sOptionMenuItemsNames[i], 8, (i * 16) + 1, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(WIN_OPTIONS, FONT_NORMAL, sOptionMenuItemsNames[i], 8, (i * 14) + 1, TEXT_SKIP_DRAW, NULL);
     CopyWindowToVram(WIN_OPTIONS, COPYWIN_FULL);
 }
 

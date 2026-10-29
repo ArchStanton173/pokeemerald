@@ -458,49 +458,11 @@ static const struct MenuAction sMenuActions_Gender[] = {
 };
 
 static const u8 *const sMalePresetNames[] = {
-    gText_DefaultNameStu,
-    gText_DefaultNameMilton,
-    gText_DefaultNameTom,
-    gText_DefaultNameKenny,
-    gText_DefaultNameReid,
-    gText_DefaultNameJude,
-    gText_DefaultNameJaxson,
-    gText_DefaultNameEaston,
-    gText_DefaultNameWalker,
-    gText_DefaultNameTeru,
-    gText_DefaultNameJohnny,
-    gText_DefaultNameBrett,
-    gText_DefaultNameSeth,
-    gText_DefaultNameTerry,
-    gText_DefaultNameCasey,
-    gText_DefaultNameDarren,
-    gText_DefaultNameLandon,
-    gText_DefaultNameCollin,
-    gText_DefaultNameStanley,
-    gText_DefaultNameQuincy
+    gText_DefaultNameXavier
 };
 
 static const u8 *const sFemalePresetNames[] = {
-    gText_DefaultNameKimmy,
-    gText_DefaultNameTiara,
-    gText_DefaultNameBella,
-    gText_DefaultNameJayla,
-    gText_DefaultNameAllie,
-    gText_DefaultNameLianna,
-    gText_DefaultNameSara,
-    gText_DefaultNameMonica,
-    gText_DefaultNameCamila,
-    gText_DefaultNameAubree,
-    gText_DefaultNameRuthie,
-    gText_DefaultNameHazel,
-    gText_DefaultNameNadine,
-    gText_DefaultNameTanja,
-    gText_DefaultNameYasmin,
-    gText_DefaultNameNicola,
-    gText_DefaultNameLillie,
-    gText_DefaultNameTerra,
-    gText_DefaultNameLucy,
-    gText_DefaultNameHalie
+    gText_DefaultNameHailan
 };
 
 // The number of male vs. female names is assumed to be the same.
@@ -1290,7 +1252,7 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
     gTasks[taskId].tPlayerSpriteId = SPRITE_NONE;
     gTasks[taskId].data[3] = 0xFF;
     gTasks[taskId].tTimer = 0xD8;
-    PlayBGM(MUS_ROUTE122);
+    PlayBGM(MUS_FALLARBOR);
     ShowBg(0);
     ShowBg(1);
 }
@@ -1337,7 +1299,7 @@ static void Task_NewGameBirchSpeech_WaitForSpriteFadeInWelcome(u8 taskId)
             NewGameBirchSpeech_ClearWindow(0);
             StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
             AddTextPrinterForMessage(TRUE);
-            gTasks[taskId].func = Task_NewGameBirchSpeech_ThisIsAPokemon;
+            gTasks[taskId].func = Task_NewGameBirchSpeech_MainSpeech;
         }
     }
 }
@@ -1670,7 +1632,7 @@ static void Task_NewGameBirchSpeech_ReshowBirchLotad(u8 taskId)
         spriteId = gTasks[taskId].tLotadSpriteId;
         gSprites[spriteId].x = 100;
         gSprites[spriteId].y = 75;
-        gSprites[spriteId].invisible = FALSE;
+        gSprites[spriteId].invisible = TRUE;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_BLEND;
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
@@ -2236,13 +2198,7 @@ static void NewGameBirchSpeech_ClearGenderWindow(u8 windowId, bool8 copyToVram)
 
 static void NewGameBirchSpeech_ClearWindow(u8 windowId)
 {
-    u8 bgColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_BACKGROUND);
-    u8 maxCharWidth = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_WIDTH);
-    u8 maxCharHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
-    u8 winWidth = GetWindowAttribute(windowId, WINDOW_WIDTH);
-    u8 winHeight = GetWindowAttribute(windowId, WINDOW_HEIGHT);
-
-    FillWindowPixelRect(windowId, bgColor, 0, 0, maxCharWidth * winWidth, maxCharHeight * winHeight);
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
     CopyWindowToVram(windowId, COPYWIN_GFX);
 }
 

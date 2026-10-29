@@ -24,6 +24,11 @@
 #include "constants/songs.h"
 #include "constants/rgb.h"
 
+//Special Safari Ball mechanics
+static void SafariOpenBallBag(void);
+static void CompleteWhenChoseSafariBall(void);
+//---------------------------------------
+
 static void SafariHandleGetMonData(void);
 static void SafariHandleGetRawMonData(void);
 static void SafariHandleSetMonData(void);
@@ -176,7 +181,7 @@ static void HandleInputChooseAction(void)
         switch (gActionSelectionCursor[gActiveBattler])
         {
         case 0:
-            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_SAFARI_BALL, 0);
+            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_USE_ITEM, 0);
             break;
         case 1:
             BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_SAFARI_POKEBLOCK, 0);
@@ -277,6 +282,26 @@ static void SafariOpenPokeblockCase(void)
 }
 
 static void CompleteWhenChosePokeblock(void)
+{
+    if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
+    {
+        BtlController_EmitOneReturnValue(B_COMM_TO_ENGINE, gSpecialVar_ItemId);
+        SafariBufferExecCompleted();
+    }
+}
+
+static void SafariOpenBallBag(void)
+{
+    if (!gPaletteFade.active)
+    {
+        gBattlerControllerFuncs[gActiveBattler] = CompleteWhenChoseSafariBall;
+        ReshowBattleScreenDummy();
+        FreeAllWindowBuffers();
+        CB2_BagMenuFromSafariBattle();
+    }
+}
+
+static void CompleteWhenChoseSafariBall(void)
 {
     if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
     {
@@ -449,6 +474,14 @@ static void HandleChooseActionAfterDma3(void)
 static void SafariHandleChooseAction(void)
 {
     s32 i;
+    if (GetBattlerSide(gActiveBattler) == B_SIDE_PLAYER)
+        {
+            UpdateHealthboxAttribute(
+             gHealthboxSpriteIds[gActiveBattler],
+             &gPlayerParty[gBattlerPartyIndexes[gActiveBattler]],
+                HEALTHBOX_SAFARI_BALLS_TEXT
+        );
+    }
 
     gBattlerControllerFuncs[gActiveBattler] = HandleChooseActionAfterDma3;
     BattlePutTextOnWindow(gText_SafariZoneMenu, B_WIN_ACTION_MENU);
@@ -474,7 +507,12 @@ static void SafariHandleChooseMove(void)
 static void SafariHandleChooseItem(void)
 {
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
-    gBattlerControllerFuncs[gActiveBattler] = SafariOpenPokeblockCase;
+
+    if (gChosenActionByBattler[gActiveBattler] == B_ACTION_USE_ITEM)
+        gBattlerControllerFuncs[gActiveBattler] = SafariOpenBallBag;
+    else
+        gBattlerControllerFuncs[gActiveBattler] = SafariOpenPokeblockCase;
+
     gBattlerInMenuId = gActiveBattler;
 }
 

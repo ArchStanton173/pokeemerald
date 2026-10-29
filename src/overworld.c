@@ -1,3 +1,4 @@
+#include "constants/heal_locations.h"
 #include "global.h"
 #include "overworld.h"
 #include "battle_pyramid.h"
@@ -66,6 +67,8 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "pokemon.h"
+#include "constants/flags.h"
 
 struct CableClubPlayer
 {
@@ -361,6 +364,7 @@ void DoWhiteOut(void)
     SetMoney(&gSaveBlock1Ptr->money, GetMoney(&gSaveBlock1Ptr->money) / 2);
     HealPlayerParty();
     Overworld_ResetStateAfterWhiteOut();
+    SetLastHealLocationWarp(HEAL_LOCATION_DEWFORD_TOWN);
     SetWarpDestinationToLastHealLocation();
     WarpIntoMap();
 }
@@ -1484,9 +1488,16 @@ void CB2_OverworldBasic(void)
 void CB2_Overworld(void)
 {
     bool32 fading = (gPaletteFade.active != 0);
+
+    // Permanently unlock the Pokemon menu once the player owns a Pokemon.
+    if (!FlagGet(FLAG_SYS_POKEMON_GET) && CalculatePlayerPartyCount() > 0)
+        FlagSet(FLAG_SYS_POKEMON_GET);
+
     if (fading)
         SetVBlankCallback(NULL);
+
     OverworldBasic();
+
     if (fading)
         SetFieldVBlankCallback();
 }
@@ -1539,7 +1550,7 @@ void CB2_NewGame(void)
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
-    gFieldCallback = ExecuteTruckSequence;
+    //gFieldCallback = ExecuteTruckSequence;
     gFieldCallback2 = NULL;
     DoMapLoadLoop(&gMain.state);
     SetFieldVBlankCallback();

@@ -57,6 +57,96 @@ DewfordTown_EventScript_Woman::
 	msgbox DewfordTown_Text_TinyIslandCommunity, MSGBOX_NPC
 	end
 
+DewfordTown_EventScript_MagikarpSalesman::
+    lock
+    faceplayer
+    goto_if_set FLAG_BOUGHT_DEWFORD_MAGIKARP, DewfordTown_EventScript_MagikarpAlreadyBought
+    checkplayergender
+    goto_if_eq VAR_RESULT, MALE, DewfordTown_EventScript_MagikarpOfferBoy
+    goto DewfordTown_EventScript_MagikarpOfferGirl
+
+DewfordTown_EventScript_MagikarpOfferBoy::
+    msgbox Dewford_Text_XavierBuyMagikarpForJust500, MSGBOX_DEFAULT
+    goto DewfordTown_EventScript_MagikarpAsk
+
+DewfordTown_EventScript_MagikarpOfferGirl::
+    msgbox Dewford_Text_HailanBuyMagikarpForJust500, MSGBOX_DEFAULT
+    goto DewfordTown_EventScript_MagikarpAsk
+
+DewfordTown_EventScript_MagikarpAsk::
+    msgbox DewfordTown_Text_MagikarpConfirm, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_MagikarpDeclined
+    checkmoney 500
+    goto_if_eq VAR_RESULT, FALSE, DewfordTown_EventScript_MagikarpNoMoney
+
+    setvar VAR_TEMP_TRANSFERRED_SPECIES, SPECIES_MAGIKARP
+    givemon SPECIES_MAGIKARP, 5
+    goto_if_eq VAR_RESULT, MON_GIVEN_TO_PARTY, DewfordTown_EventScript_MagikarpSuccess
+    goto_if_eq VAR_RESULT, MON_GIVEN_TO_PC, DewfordTown_EventScript_MagikarpSuccessPC
+    goto DewfordTown_EventScript_MagikarpNoRoom
+
+DewfordTown_EventScript_MagikarpSuccess::
+    removemoney 500
+    setflag FLAG_BOUGHT_DEWFORD_MAGIKARP
+
+    playfanfare MUS_OBTAIN_ITEM
+    message DewfordTown_Text_ReceivedMagikarp
+    waitfanfare
+    waitmessage
+
+    bufferspeciesname STR_VAR_1, SPECIES_MAGIKARP
+    msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+    goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_MagikarpFinish
+
+    call Common_EventScript_GetGiftMonPartySlot
+    call Common_EventScript_NameReceivedPartyMon
+    goto DewfordTown_EventScript_MagikarpFinish
+
+DewfordTown_EventScript_MagikarpSuccessPC::
+    removemoney 500
+    setflag FLAG_BOUGHT_DEWFORD_MAGIKARP
+
+    playfanfare MUS_OBTAIN_ITEM
+    message DewfordTown_Text_ReceivedMagikarp
+    waitfanfare
+    waitmessage
+
+    goto DewfordTown_EventScript_MagikarpFinish
+
+DewfordTown_EventScript_MagikarpFinish::
+    msgbox DewfordTown_Text_MagikarpPurchased, MSGBOX_DEFAULT
+    release
+    end
+
+    playfanfare MUS_OBTAIN_ITEM
+    message DewfordTown_Text_ReceivedMagikarp
+    waitfanfare
+    waitmessage
+
+    msgbox DewfordTown_Text_MagikarpPurchased, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_MagikarpDeclined::
+    msgbox DewfordTown_Text_MagikarpDeclined, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_MagikarpNoMoney::
+    msgbox DewfordTown_Text_MagikarpNoMoney, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_MagikarpNoRoom::
+    msgbox DewfordTown_Text_MagikarpNoRoom, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_MagikarpAlreadyBought::
+    msgbox DewfordTown_Text_MagikarpAlreadyBought, MSGBOX_DEFAULT
+    release
+    end
+
 DewfordTown_EventScript_TownSign::
 	msgbox DewfordTown_Text_TownSign, MSGBOX_SIGN
 	end
@@ -781,3 +871,163 @@ DewfordTown_Text_YeahDefinitionOfInRightNow:
 	.string "Yeah, absolutely right!\p"
 	.string "“{STR_VAR_1}” is the\n"
 	.string "definition of “in” right now.$"
+
+Dewford_Text_XavierBuyMagikarpForJust500::
+    .string "SALESMAN: Ho there, laddie!\n"
+    .string "Have I got a deal just for you!\p"
+    .string "I'll sell you a super-special POKéMON\n"
+    .string "- a MAGIKARP - for just ¥500!\p"
+    .string "So, you'll buy it, am I right? Y'know…\n"
+    .string "they say that MAGIKARP evolves into\l"
+    .string "a ferocious dragon!$"
+
+Dewford_Text_HailanBuyMagikarpForJust500::
+    .string "SALESMAN: Ho there, lassie!\n"
+    .string "Have I got a deal just for you!\p"
+    .string "I'll sell you a super-special POKéMON\n"
+    .string "- a MAGIKARP - for just ¥500!\p"
+    .string "So, you'll buy it, am I right? Y'know…\n"
+    .string "they say that MAGIKARP evolves into\l"
+    .string "a ferocious dragon!$"
+
+DewfordTown_Text_MagikarpConfirm::
+    .string "Buy a MAGIKARP for ¥500?$"
+
+DewfordTown_Text_ReceivedMagikarp::
+    .string "{PLAYER} received MAGIKARP!$"
+
+DewfordTown_Text_MagikarpPurchased::
+    .string "SALESMAN: A fine purchase!\n"
+    .string "Take good care of that MAGIKARP!$"
+
+DewfordTown_Text_MagikarpDeclined::
+    .string "SALESMAN: You're missing out on\n"
+    .string "the deal of a lifetime!$"
+
+DewfordTown_Text_MagikarpNoMoney::
+    .string "SALESMAN: You haven't got ¥500!\n"
+    .string "Come back when you've got the cash!$"
+
+DewfordTown_Text_MagikarpNoRoom::
+    .string "SALESMAN: Looks like you can't\n"
+    .string "take another POKéMON right now!$"
+
+DewfordTown_Text_MagikarpAlreadyBought::
+    .string "SALESMAN: How's that MAGIKARP?\n"
+    .string "A real bargain, wasn't it?$"
+
+DewfordTown_EventScript_Brawly::
+    lock
+    faceplayer
+    goto_if_set FLAG_RECEIVED_HM_SURF, DewfordTown_EventScript_BrawlyAfterSurf
+
+    specialvar VAR_RESULT, CalculatePlayerPartyCount
+    goto_if_eq VAR_RESULT, 0, DewfordTown_EventScript_BrawlyNoPokemon
+
+    goto_if_unset FLAG_DEWFORD_BRAWLY_INTRO_SEEN, DewfordTown_EventScript_BrawlyFirstMeetingWithPokemon
+    goto DewfordTown_EventScript_BrawlyGiveSurf
+
+DewfordTown_EventScript_BrawlyNoPokemon::
+    goto_if_set FLAG_DEWFORD_BRAWLY_INTRO_SEEN, DewfordTown_EventScript_BrawlyReminder
+    msgbox DewfordTown_Text_BrawlyIntro, MSGBOX_DEFAULT
+    setflag FLAG_DEWFORD_BRAWLY_INTRO_SEEN
+    release
+    end
+
+DewfordTown_EventScript_BrawlyFirstMeetingWithPokemon::
+    msgbox DewfordTown_Text_BrawlyFirstMeetingWithPokemon, MSGBOX_DEFAULT
+    setflag FLAG_DEWFORD_BRAWLY_INTRO_SEEN
+    goto DewfordTown_EventScript_BrawlyGiveSurfItem
+
+DewfordTown_EventScript_BrawlyReminder::
+    msgbox DewfordTown_Text_BrawlyReminder, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_BrawlyGiveSurf::
+    msgbox DewfordTown_Text_BrawlyFoundPokemon, MSGBOX_DEFAULT
+
+DewfordTown_EventScript_BrawlyGiveSurfItem::
+    giveitem ITEM_HM_SURF
+    goto_if_eq VAR_RESULT, FALSE, DewfordTown_EventScript_BrawlyBagFull
+    setflag FLAG_RECEIVED_HM_SURF
+	setflag FLAG_CAN_USE_SURF
+    msgbox DewfordTown_Text_BrawlyExplainHM, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_BrawlyBagFull::
+    msgbox DewfordTown_Text_BrawlyBagFull, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_EventScript_BrawlyAfterSurf::
+    msgbox DewfordTown_Text_BrawlyRetired, MSGBOX_DEFAULT
+    release
+    end
+
+DewfordTown_Text_BrawlyIntro:
+    .string "BRAWLY: Hey, how's it hanging?\p"
+    .string "I see you've somewhat got your\n"
+    .string "bearings.\p"
+    .string "If you wanna leave DEWFORD,\n"
+    .string "I can help you out by giving you\l"
+    .string "a special item that'll let you\l"
+    .string "traverse the seas.\p"
+    .string "But it's sort-of impossible to use\n"
+    .string "without first owning a POKéMON\l"
+    .string "that can swim in the water.\p"
+    .string "Tell you what: go catch yourself\n"
+    .string "a 'mon, and I'll give the item\l"
+    .string "to you.$"
+
+DewfordTown_Text_BrawlyReminder:
+    .string "BRAWLY: Go grab a POKéMON, and show\n"
+    .string "it to me.\p"
+    .string "I'll give you an item that'll\n"
+    .string "let you traverse the seas!$"
+
+DewfordTown_Text_BrawlyFoundPokemon:
+    .string "BRAWLY: Ah, there it is!\n"
+    .string "You're a natural at this catching\l"
+    .string "thing.\p"
+    .string "Well, I'll hold up my end of the\n"
+    .string "bargain, then. Here you go!$"
+
+DewfordTown_Text_BrawlyFirstMeetingWithPokemon:
+    .string "BRAWLY: Ah! I see you're getting\n"
+    .string "your bearings just fine.\p"
+    .string "And you've even caught a POKéMON\n"
+    .string "to boot!\p"
+    .string "Righteous stuff, buddy.\p"
+    .string "In that case, lemme give you\n"
+    .string "this special item.\p"
+    .string "It'll help you traverse the seas.$"
+
+DewfordTown_Text_BrawlyExplainHM:
+    .string "BRAWLY: That's called an HM. Open up\n"
+    .string "your BAG, and USE it on a POKéMON to\l"
+    .string "teach them a special move.\p"
+    .string "Oh, uh... Moves are kinda like spells\n"
+    .string "that your POKéMON can cast to fight\l"
+    .string "in battle.\p"
+    .string "But in the case of HMs, a move like\n"
+    .string "SURF can also be used outside of\l"
+    .string "battle!\p"
+    .string "Go up to any body of water and press A\n"
+    .string "once you've got a POKéMON that knows\l"
+	.string "SURF. You'll see what I mean.$"
+
+DewfordTown_Text_BrawlyBagFull:
+    .string "Whoa, your BAG is full!\p"
+    .string "Make some room and come back. I've\n"
+    .string "still got your special item!$"
+
+DewfordTown_Text_BrawlyRetired:
+    .string "BRAWLY: Y'know... I used to be\n"
+    .string "somewhat of a famous fighter.\p"
+    .string "That was back in the days of the\n"
+    .string "POKéMON LEAGUE.\p"
+    .string "Now that the economy has gotten so\n"
+    .string "bad, and the POKéMON LEAGUE is gone,\l"
+    .string "I had to close my GYM. Sad times.$"

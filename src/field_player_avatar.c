@@ -655,7 +655,7 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
         return;
     }
 
-    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
+    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON)
      && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0)
     {
         PlayerRun(direction);
@@ -1842,11 +1842,8 @@ static bool8 Fishing_ShowDots(struct Task *task)
 
 static bool8 Fishing_CheckForBite(struct Task *task)
 {
-    bool8 bite;
-
     AlignFishingAnimationFrames();
     task->tStep++;
-    bite = FALSE;
 
     if (!DoesCurrentMapHaveFishingMons())
     {
@@ -1854,27 +1851,12 @@ static bool8 Fishing_CheckForBite(struct Task *task)
     }
     else
     {
-        if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
-        {
-            u8 ability = GetMonAbility(&gPlayerParty[0]);
-            if (ability == ABILITY_SUCTION_CUPS || ability  == ABILITY_STICKY_HOLD)
-            {
-                if (Random() % 100 > 14)
-                    bite = TRUE;
-            }
-        }
-
-        if (!bite)
-        {
-            if (Random() & 1)
-                task->tStep = FISHING_NO_BITE;
-            else
-                bite = TRUE;
-        }
-
-        if (bite == TRUE)
-            StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingBiteDirectionAnimNum(GetPlayerFacingDirection()));
+        StartSpriteAnim(
+            &gSprites[gPlayerAvatar.spriteId],
+            GetFishingBiteDirectionAnimNum(GetPlayerFacingDirection())
+        );
     }
+
     return TRUE;
 }
 

@@ -36,6 +36,7 @@
 #include "constants/trainers.h"
 #include "constants/rgb.h"
 
+static u8 sRememberedBattleTargets[MAX_BATTLERS_COUNT];
 static void PlayerHandleGetMonData(void);
 static void PlayerHandleSetMonData(void);
 static void PlayerHandleSetRawMonData(void);
@@ -192,6 +193,7 @@ void BattleControllerDummy(void)
 
 void SetControllerToPlayer(void)
 {
+    sRememberedBattleTargets[gActiveBattler] = 0xFF;
     gBattlerControllerFuncs[gActiveBattler] = PlayerBufferRunCommand;
     gDoingBattleAnim = FALSE;
     gPlayerDpadHoldFrames = 0;
@@ -364,6 +366,8 @@ static void HandleInputChooseTarget(void)
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
+        if (!gSaveBlock2Ptr->optionsCursorMemoryOff)
+            sRememberedBattleTargets[gActiveBattler] = GetBattlerPosition(gMultiUsePlayerCursor);
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCB_HideAsMoveTarget;
         BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_EXEC_SCRIPT, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
         EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
@@ -536,6 +540,18 @@ static void HandleInputChooseMove(void)
                 gMultiUsePlayerCursor = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
             else
                 gMultiUsePlayerCursor = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+            if (!gSaveBlock2Ptr->optionsCursorMemoryOff
+                && sRememberedBattleTargets[gActiveBattler] < MAX_BATTLERS_COUNT)
+                {
+                    u8 rememberedTarget = GetBattlerAtPosition(sRememberedBattleTargets[gActiveBattler]);
+
+                    if (rememberedTarget < gBattlersCount
+                        && !(gAbsentBattlerFlags & gBitTable[rememberedTarget])
+                        && GetBattlerSide(rememberedTarget) != GetBattlerSide(gActiveBattler))
+                        {
+                            gMultiUsePlayerCursor = rememberedTarget;
+                        }
+                }
 
             gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCB_ShowAsMoveTarget;
         }
@@ -2643,6 +2659,19 @@ static void PlayerHandleChooseMove(void)
 void InitMoveSelectionsVarsAndStrings(void)
 {
     MoveSelectionDisplayMoveNames();
+
+    // Cursor Memory OFF: always begin at the first move.
+    // Cursor Memory ON: preserve the previous move when valid.
+    if (gSaveBlock2Ptr->optionsCursorMemoryOff)
+    {
+        gMoveSelectionCursor[gActiveBattler] = 0;
+    }
+    else if (gNumberOfMovesToChoose == 0
+          || gMoveSelectionCursor[gActiveBattler] >= gNumberOfMovesToChoose)
+    {
+        gMoveSelectionCursor[gActiveBattler] = 0;
+    }
+
     gMultiUsePlayerCursor = 0xFF;
     MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 0);
     MoveSelectionDisplayPPString();
@@ -3100,19 +3129,24 @@ static void PlayerHandleLinkStandbyMsg(void)
 
 static void PlayerHandleResetActionMoveSelection(void)
 {
-    switch (gBattleBufferA[gActiveBattler][1])
+    if (gSaveBlock2Ptr->optionsCursorMemoryOff
+     || (gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
-    case RESET_ACTION_MOVE_SELECTION:
-        gActionSelectionCursor[gActiveBattler] = 0;
-        gMoveSelectionCursor[gActiveBattler] = 0;
-        break;
-    case RESET_ACTION_SELECTION:
-        gActionSelectionCursor[gActiveBattler] = 0;
-        break;
-    case RESET_MOVE_SELECTION:
-        gMoveSelectionCursor[gActiveBattler] = 0;
-        break;
+        switch (gBattleBufferA[gActiveBattler][1])
+        {
+        case RESET_ACTION_MOVE_SELECTION:
+            gActionSelectionCursor[gActiveBattler] = 0;
+            gMoveSelectionCursor[gActiveBattler] = 0;
+            break;
+        case RESET_ACTION_SELECTION:
+            gActionSelectionCursor[gActiveBattler] = 0;
+            break;
+        case RESET_MOVE_SELECTION:
+            gMoveSelectionCursor[gActiveBattler] = 0;
+            break;
+        }
     }
+
     PlayerBufferExecCompleted();
 }
 

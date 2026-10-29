@@ -158,6 +158,8 @@ enum
     HEALTHBOX_GFX_FRAME_END_BAR,
 };
 
+static void UpdateSafariBallsTextOnHealthbox(u8 healthboxSpriteId);
+
 static const u8 *GetHealthboxElementGfxPtr(u8);
 static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *, u32, u32, u32, u32 *);
 
@@ -2131,12 +2133,13 @@ static u8 GetStatusIconForBattlerId(u8 statusElementId, u8 battler)
     return ret;
 }
 
+static const u8 sText_FleeRisk[] = _("FLEE RISK");
 static void UpdateSafariBallsTextOnHealthbox(u8 healthboxSpriteId)
 {
     u32 windowId, spriteTileNum;
     u8 *windowTileData;
 
-    windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(gText_SafariBalls, 0, 3, 2, &windowId);
+    windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(sText_FleeRisk, 0, 3, 2, &windowId);
     spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
     TextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0x40) + spriteTileNum, windowTileData, 6);
     TextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0x800) + spriteTileNum, windowTileData + 0xC0, 2);
@@ -2149,14 +2152,45 @@ static void UpdateLeftNoOfBallsTextOnHealthbox(u8 healthboxSpriteId)
     u8 *txtPtr;
     u32 windowId, spriteTileNum;
     u8 *windowTileData;
+    u32 fleeRisk;
 
-    txtPtr = StringCopy(text, gText_SafariBallLeft);
-    ConvertIntToDecimalStringN(txtPtr, gNumSafariBalls, STR_CONV_MODE_LEFT_ALIGN, 2);
+    fleeRisk = gBattleStruct->safariEscapeFactor * 5;
 
-    windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(text, GetStringRightAlignXOffset(FONT_SMALL, text, 0x2F), 3, 2, &windowId);
+    if (fleeRisk > 100)
+        fleeRisk = 100;
+
+    txtPtr = ConvertIntToDecimalStringN(
+        text,
+        fleeRisk,
+        STR_CONV_MODE_LEFT_ALIGN,
+        3
+    );
+
+    *txtPtr++ = CHAR_PERCENT;
+    *txtPtr = EOS;
+
+    windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(
+        text,
+        GetStringRightAlignXOffset(FONT_SMALL, text, 0x2F),
+        3,
+        2,
+        &windowId
+    );
+
     spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
-    SafariTextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0x2C0) + spriteTileNum, windowTileData, 2);
-    SafariTextIntoHealthboxObject((void *)(OBJ_VRAM0 + 0xA00) + spriteTileNum, windowTileData + 0x40, 4);
+
+    SafariTextIntoHealthboxObject(
+        (void *)(OBJ_VRAM0 + 0x2C0) + spriteTileNum,
+        windowTileData,
+        2
+    );
+
+    SafariTextIntoHealthboxObject(
+        (void *)(OBJ_VRAM0 + 0xA00) + spriteTileNum,
+        windowTileData + 0x40,
+        4
+    );
+
     RemoveWindowOnHealthbox(windowId);
 }
 

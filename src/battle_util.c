@@ -451,7 +451,8 @@ bool8 TryRunFromBattle(u8 battler)
     }
     else
     {
-        if (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE))
+            if (!(gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+                || !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
         {
             if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             {
@@ -560,28 +561,36 @@ void HandleAction_SafariZoneBallThrow(void)
 
 void HandleAction_ThrowPokeblock(void)
 {
+    u8 amount;
+
     gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
     gBattle_BG0_X = 0;
     gBattle_BG0_Y = 0;
-    gBattleCommunication[MULTISTRING_CHOOSER] = gBattleBufferB[gBattlerAttacker][1] - 1;
-    gLastUsedItem = gBattleBufferB[gBattlerAttacker][2];
+
+    // Fixed, generic bait. No Pokeblock selection or inventory.
+    gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_MON_CURIOUS;
+    gLastUsedItem = 0;
 
     if (gBattleResults.pokeblockThrows < 255)
         gBattleResults.pokeblockThrows++;
+
+    // Mirror GO NEAR's progressively smaller catch-factor changes.
+    amount = sGoNearCounterToCatchFactor[gBattleStruct->safariPkblThrowCounter];
+
+    if (gBattleStruct->safariCatchFactor > amount)
+        gBattleStruct->safariCatchFactor -= amount;
+    else
+        gBattleStruct->safariCatchFactor = 1;
+
+    // GO NEAR adds 4 escape-factor points.
+    // BAIT removes 4, stopping at the minimum of 1.
+    if (gBattleStruct->safariEscapeFactor > 4)
+        gBattleStruct->safariEscapeFactor -= 4;
+    else
+        gBattleStruct->safariEscapeFactor = 1;
+
     if (gBattleStruct->safariPkblThrowCounter < 3)
         gBattleStruct->safariPkblThrowCounter++;
-    if (gBattleStruct->safariEscapeFactor > 1)
-    {
-        // BUG: safariEscapeFactor can become 0 below. This causes the pokeblock throw glitch.
-        #ifdef BUGFIX
-        if (gBattleStruct->safariEscapeFactor <= sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]])
-        #else
-        if (gBattleStruct->safariEscapeFactor < sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]])
-        #endif
-            gBattleStruct->safariEscapeFactor = 1;
-        else
-            gBattleStruct->safariEscapeFactor -= sPkblToEscapeFactor[gBattleStruct->safariPkblThrowCounter][gBattleCommunication[MULTISTRING_CHOOSER]];
-    }
 
     gBattlescriptCurrInstr = gBattlescriptsForSafariActions[2];
     gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;

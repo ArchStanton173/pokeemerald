@@ -3877,11 +3877,12 @@ void GetBattlePyramidHint(void)
     gSpecialVar_Result -= (gSpecialVar_Result / TOTAL_PYRAMID_ROUNDS) * TOTAL_PYRAMID_ROUNDS;
 }
 
-// Used to avoid a potential softlock if the player respawns on Dewford with no way off
+
+//If you get softlocked on Dewford, sorry, sucks to be you. Skill issue.
 void ResetHealLocationFromDewford(void)
 {
-    if (gSaveBlock1Ptr->lastHealLocation.mapGroup == MAP_GROUP(MAP_DEWFORD_TOWN) && gSaveBlock1Ptr->lastHealLocation.mapNum == MAP_NUM(MAP_DEWFORD_TOWN))
-        SetLastHealLocationWarp(HEAL_LOCATION_PETALBURG_CITY);
+    // Intentionally does nothing.
+    // Dewford is a valid respawn location.
 }
 
 bool8 InPokemonCenter(void)

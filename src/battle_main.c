@@ -4142,6 +4142,21 @@ static void HandleTurnActionSelectionState(void)
             break;
         case STATE_BEFORE_ACTION_CHOSEN: // Choose an action.
             *(gBattleStruct->monToSwitchIntoId + gActiveBattler) = PARTY_SIZE;
+
+                // In ordinary wild double battles, running is a team-wide action.
+                // If the left player battler has chosen RUN, the right player
+                // battler does not need to select an additional action.
+                if ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+                    && !(gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_SAFARI | BATTLE_TYPE_LINK))
+                    && position == B_POSITION_PLAYER_RIGHT
+                    && gChosenActionByBattler[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)] == B_ACTION_RUN
+                    && (gBattleCommunication[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)] == STATE_WAIT_ACTION_CONFIRMED_STANDBY
+                    || gBattleCommunication[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)] == STATE_WAIT_ACTION_CONFIRMED))
+    {
+        gChosenActionByBattler[gActiveBattler] = B_ACTION_NOTHING_FAINTED;
+        gBattleCommunication[gActiveBattler] = STATE_WAIT_ACTION_CONFIRMED;
+        break;
+    }
             if (gBattleTypeFlags & BATTLE_TYPE_MULTI
                 || (position & BIT_FLANK) == B_FLANK_LEFT
                 || gBattleStruct->absentBattlerFlags & gBitTable[GetBattlerAtPosition(BATTLE_PARTNER(position))]
@@ -4276,8 +4291,6 @@ static void HandleTurnActionSelectionState(void)
                     }
                     break;
                 case B_ACTION_SAFARI_POKEBLOCK:
-                    BtlController_EmitChooseItem(B_COMM_TO_CONTROLLER, gBattleStruct->battlerPartyOrders[gActiveBattler]);
-                    MarkBattlerForControllerExec(gActiveBattler);
                     break;
                 case B_ACTION_CANCEL_PARTNER:
                     gBattleCommunication[gActiveBattler] = STATE_WAIT_SET_BEFORE_ACTION;
@@ -4437,10 +4450,7 @@ static void HandleTurnActionSelectionState(void)
                     gBattleCommunication[gActiveBattler]++;
                     break;
                 case B_ACTION_SAFARI_POKEBLOCK:
-                    if ((gBattleBufferB[gActiveBattler][1] | (gBattleBufferB[gActiveBattler][2] << 8)) != 0)
-                        gBattleCommunication[gActiveBattler]++;
-                    else
-                        gBattleCommunication[gActiveBattler] = STATE_BEFORE_ACTION_CHOSEN;
+                    gBattleCommunication[gActiveBattler]++;
                     break;
                 case B_ACTION_SAFARI_GO_NEAR:
                     gBattleCommunication[gActiveBattler]++;

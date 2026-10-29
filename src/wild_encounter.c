@@ -376,11 +376,10 @@ static u8 PickWildMonNature(void)
     return Random() % NUM_NATURES;
 }
 
-static void CreateWildMon(u16 species, u8 level)
+static void CreateWildMonInSlot(u16 species, u8 level, u8 slot)
 {
     bool32 checkCuteCharm;
 
-    ZeroEnemyPartyMons();
     checkCuteCharm = TRUE;
 
     switch (gSpeciesInfo[species].genderRatio)
@@ -401,18 +400,81 @@ static void CreateWildMon(u16 species, u8 level)
         u32 leadingMonPersonality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
         u8 gender = GetGenderFromSpeciesAndPersonality(leadingMonSpecies, leadingMonPersonality);
 
-        // misses mon is genderless check, although no genderless mon can have cute charm as ability
         if (gender == MON_FEMALE)
             gender = MON_MALE;
         else
             gender = MON_FEMALE;
 
-        CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, USE_RANDOM_IVS, gender, PickWildMonNature(), 0);
+        CreateMonWithGenderNatureLetter(
+            &gEnemyParty[slot],
+            species,
+            level,
+            USE_RANDOM_IVS,
+            gender,
+            PickWildMonNature(),
+            0
+        );
         return;
     }
 
-    CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, PickWildMonNature());
+    CreateMonWithNature(
+        &gEnemyParty[slot],
+        species,
+        level,
+        USE_RANDOM_IVS,
+        PickWildMonNature()
+    );
 }
+
+static void CreateWildMon(u16 species, u8 level)
+{
+    ZeroEnemyPartyMons();
+    CreateWildMonInSlot(species, level, 0);
+}
+
+//Generates a second wild mon in wild doubles.
+static void CreateSecondWildMon(const struct WildPokemonInfo *wildMonInfo, u8 area)
+{
+    u8 wildMonIndex;
+
+    switch (area)
+    {
+    case WILD_AREA_LAND:
+        wildMonIndex = ChooseWildMonIndex_Land();
+        break;
+
+    case WILD_AREA_WATER:
+    case WILD_AREA_ROCKS:
+        wildMonIndex = ChooseWildMonIndex_WaterRock();
+        break;
+
+    default:
+        return;
+    }
+
+    CreateWildMonInSlot(
+        wildMonInfo->wildPokemon[wildMonIndex].species,
+        ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]),
+        1
+    );
+}
+
+//Safari encounters are always single battles
+static void StartOrdinaryWildEncounter(
+    const struct WildPokemonInfo *wildMonInfo,
+    u8 area)
+{
+    if (!GetSafariZoneFlag() && CalculatePlayerPartyCount() >= 2)
+    {
+        CreateSecondWildMon(wildMonInfo, area);
+        BattleSetup_StartDoubleWildBattle();
+    }
+    else
+    {
+        BattleSetup_StartWildBattle();
+    }
+}
+
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)
 #else
@@ -618,12 +680,15 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
                     return TRUE;
                 }
 
-                // try a regular wild land encounter
+                // Try a regular wild land encounter.
                 if (TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
-                    BattleSetup_StartWildBattle();
-                    return TRUE;
-                }
+                    StartOrdinaryWildEncounter(
+                    gWildMonHeaders[headerId].landMonsInfo,
+                    WILD_AREA_LAND
+                );
+                return TRUE;
+            }
 
                 return FALSE;
             }
@@ -649,11 +714,14 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
                 BattleSetup_StartRoamerBattle();
                 return TRUE;
             }
-            else // try a regular surfing encounter
+            else // Try a regular surfing encounter.
             {
                 if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
-                    BattleSetup_StartWildBattle();
+                    StartOrdinaryWildEncounter(
+                    gWildMonHeaders[headerId].waterMonsInfo,
+                    WILD_AREA_WATER
+                    );
                     return TRUE;
                 }
 
