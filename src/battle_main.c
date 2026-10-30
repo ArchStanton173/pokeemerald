@@ -3113,10 +3113,10 @@ static void BattleStartClearSetData(void)
     // In 1-v-2 battles, the player's second battler does not exist.
     if (gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO)
     {
-    gAbsentBattlerFlags |= gBitTable[2];
+        gAbsentBattlerFlags |= gBitTable[2];
     }
 
-gBattleStruct->runTries = 0;
+    gBattleStruct->runTries = 0;
     gBattleStruct->safariGoNearCounter = 0;
     gBattleStruct->safariPkblThrowCounter = 0;
     *(&gBattleStruct->safariCatchFactor) = gSpeciesInfo[GetMonData(&gEnemyParty[0], MON_DATA_SPECIES)].catchRate * 100 / 1275;
