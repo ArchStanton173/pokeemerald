@@ -4531,8 +4531,13 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Elliot1[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_Ned[] = {
     {
     .iv = 10,
-    .lvl = 11,
+    .lvl = 5,
     .species = SPECIES_TENTACOOL,
+    },
+    {
+    .iv = 10,
+    .lvl = 6,
+    .species = SPECIES_REMORAID,
     }
 };
 

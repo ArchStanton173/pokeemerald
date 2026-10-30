@@ -94,7 +94,19 @@ void InitBattleControllers(void)
     else
         InitSinglePlayerBtlControllers();
 
-    SetBattlePartyIds();
+    // Allow one player Pokémon against two trainer Pokémon.
+    // The existing 1-v-2 intro logic will mark the second
+    // player battler as absent.
+    if ((gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOUBLE))
+        == (BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOUBLE)
+        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_MULTI
+                           | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_FRONTIER))
+        && CalculatePlayerPartyCount() == 1)
+{
+    gBattleTypeFlags |= BATTLE_TYPE_ONE_V_TWO;
+}
+
+SetBattlePartyIds();
 
     if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
     {
