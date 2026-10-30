@@ -3109,7 +3109,14 @@ static void BattleStartClearSetData(void)
     gBattleScripting.animTargetsHit = 0;
     gLeveledUpInBattle = 0;
     gAbsentBattlerFlags = 0;
-    gBattleStruct->runTries = 0;
+
+    // In 1-v-2 battles, the player's second battler does not exist.
+    if (gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO)
+    {
+    gAbsentBattlerFlags |= gBitTable[2];
+    }
+
+gBattleStruct->runTries = 0;
     gBattleStruct->safariGoNearCounter = 0;
     gBattleStruct->safariPkblThrowCounter = 0;
     *(&gBattleStruct->safariCatchFactor) = gSpeciesInfo[GetMonData(&gEnemyParty[0], MON_DATA_SPECIES)].catchRate * 100 / 1275;
@@ -3359,11 +3366,20 @@ static void BattleIntroGetMonsData(void)
     switch (gBattleCommunication[MULTIUSE_STATE])
     {
     case 0:
-        gActiveBattler = gBattleCommunication[1];
-        BtlController_EmitGetMonData(B_COMM_TO_CONTROLLER, REQUEST_ALL_BATTLE, 0);
-        MarkBattlerForControllerExec(gActiveBattler);
-        gBattleCommunication[MULTIUSE_STATE]++;
+    gActiveBattler = gBattleCommunication[1];
+
+    // Do not request party data for the nonexistent second player.
+    if (gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO
+        && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT)
+    {
+        gBattleCommunication[MULTIUSE_STATE] = 1;
         break;
+    }
+
+    BtlController_EmitGetMonData(B_COMM_TO_CONTROLLER, REQUEST_ALL_BATTLE, 0);
+    MarkBattlerForControllerExec(gActiveBattler);
+    gBattleCommunication[MULTIUSE_STATE]++;
+    break;
     case 1:
         if (gBattleControllerExecFlags == 0)
         {
@@ -3400,6 +3416,13 @@ static void BattleIntroDrawTrainersOrMonsSprites(void)
 
     for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
     {
+        // The second player battler is not present in 1-v-2 battles.
+        if (gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO
+        && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT)
+    {
+        memset(&gBattleMons[gActiveBattler], 0, sizeof(struct BattlePokemon));
+        continue;
+    }
         if ((gBattleTypeFlags & BATTLE_TYPE_SAFARI)
             && GetBattlerSide(gActiveBattler) == B_SIDE_PLAYER)
         {

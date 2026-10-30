@@ -17,7 +17,7 @@ gText_Birch_MainSpeech::
 	.string "Well, anyways, your boat was smashed-\l"
 	.string "up on the shore. No salvaging that\l"
 	.string "pile of planks.\p"
-	.string "You can stay here at the ADMIRAL BENBOW\n"
+	.string "You can stay here at the CAPTAIN STERN\n"
 	.string "INN until you find a way to get on your\l"
 	.string "feet, a'ight? I paid your room for ya.\p"
 	.string "$"

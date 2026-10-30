@@ -570,32 +570,32 @@
           "map": "MAP_ROUTE105",
           "base_label": "gRoute105",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
               {
-                "min_level": 5,
-                "max_level": 35,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
-                "min_level": 10,
-                "max_level": 30,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_WINGULL"
               },
               {
-                "min_level": 15,
-                "max_level": 25,
-                "species": "SPECIES_WINGULL"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 11,
+                "max_level": 13,
+                "species": "SPECIES_OCTILLERY"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               }
             ]
           },
@@ -604,12 +604,12 @@
             "mons": [
               {
                 "min_level": 5,
-                "max_level": 10,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
-                "min_level": 5,
-                "max_level": 10,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
@@ -2782,11 +2782,11 @@
           "map": "MAP_ROUTE106",
           "base_label": "gRoute106",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
               {
-                "min_level": 2,
-                "max_level": 4,
+                "min_level": 5,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
@@ -2800,9 +2800,9 @@
                 "species": "SPECIES_WINGULL"
               },
               {
-                "min_level": 2,
-                "max_level": 4,
-                "species": "SPECIES_WINGULL"
+                "min_level": 10,
+                "max_level": 12,
+                "species": "SPECIES_OCTILLERY"
               },
               {
                 "min_level": 2,
@@ -2820,8 +2820,8 @@
                 "species": "SPECIES_TENTACOOL"
               },
               {
-                "min_level": 2,
-                "max_level": 4,
+                "min_level": 5,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
@@ -2871,11 +2871,11 @@
           "map": "MAP_ROUTE107",
           "base_label": "gRoute107",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
               {
-                "min_level": 2,
-                "max_level": 4,
+                "min_level": 5,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
@@ -2889,9 +2889,9 @@
                 "species": "SPECIES_REMORAID"
               },
               {
-                "min_level": 2,
-                "max_level": 4,
-                "species": "SPECIES_REMORAID"
+                "min_level": 10,
+                "max_level": 12,
+                "species": "SPECIES_OCTILLERY"
               },
               {
                 "min_level": 2,
@@ -2960,32 +2960,32 @@
           "map": "MAP_ROUTE108",
           "base_label": "gRoute108",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
-              {
-                "min_level": 5,
-                "max_level": 35,
+                            {
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
-                "min_level": 10,
-                "max_level": 30,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_WINGULL"
               },
               {
-                "min_level": 15,
-                "max_level": 25,
-                "species": "SPECIES_WINGULL"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 11,
+                "max_level": 13,
+                "species": "SPECIES_OCTILLERY"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               }
             ]
           },
@@ -2994,12 +2994,12 @@
             "mons": [
               {
                 "min_level": 5,
-                "max_level": 10,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
-                "min_level": 5,
-                "max_level": 10,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
@@ -3049,32 +3049,32 @@
           "map": "MAP_ROUTE109",
           "base_label": "gRoute109",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
               {
-                "min_level": 5,
-                "max_level": 35,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
-                "min_level": 10,
-                "max_level": 30,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_WINGULL"
               },
               {
-                "min_level": 15,
-                "max_level": 25,
-                "species": "SPECIES_WINGULL"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 11,
+                "max_level": 13,
+                "species": "SPECIES_OCTILLERY"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_PELIPPER"
+                "min_level": 3,
+                "max_level": 5,
+                "species": "SPECIES_REMORAID"
               }
             ]
           },
@@ -3083,12 +3083,12 @@
             "mons": [
               {
                 "min_level": 5,
-                "max_level": 10,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
-                "min_level": 5,
-                "max_level": 10,
+                "min_level": 3,
+                "max_level": 5,
                 "species": "SPECIES_TENTACOOL"
               },
               {
@@ -8544,11 +8544,11 @@
           "map": "MAP_DEWFORD_TOWN",
           "base_label": "gDewfordTown",
           "water_mons": {
-            "encounter_rate": 4,
+            "encounter_rate": 2,
             "mons": [
               {
-                "min_level": 2,
-                "max_level": 4,
+                "min_level": 5,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {
@@ -8559,7 +8559,7 @@
               {
                 "min_level": 2,
                 "max_level": 4,
-                "species": "SPECIES_WINGULL"
+                "species": "SPECIES_TENTACOOL"
               },
               {
                 "min_level": 2,
@@ -8582,8 +8582,8 @@
                 "species": "SPECIES_TENTACOOL"
               },
               {
-                "min_level": 2,
-                "max_level": 4,
+                "min_level": 5,
+                "max_level": 5,
                 "species": "SPECIES_MAGIKARP"
               },
               {

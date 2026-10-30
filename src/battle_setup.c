@@ -406,6 +406,20 @@ void BattleSetup_StartDoubleWildBattle(void)
     gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;
 }
 
+void BattleSetup_StartOneVTwoWildBattle(void)
+{
+    if (GetSafariZoneFlag())
+    {
+        BattleSetup_StartWildBattle();
+        return;
+    }
+
+    DoStandardWildBattle();
+
+    gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;
+    gBattleTypeFlags |= BATTLE_TYPE_ONE_V_TWO;
+}
+
 void BattleSetup_StartBattlePikeWildBattle(void)
 {
     DoBattlePikeWildBattle();

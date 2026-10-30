@@ -464,7 +464,16 @@ static void StartOrdinaryWildEncounter(
     const struct WildPokemonInfo *wildMonInfo,
     u8 area)
 {
-    if (!GetSafariZoneFlag() && CalculatePlayerPartyCount() >= 2)
+    if (GetSafariZoneFlag())
+    {
+        BattleSetup_StartWildBattle();
+    }
+    else if (CalculatePlayerPartyCount() == 1)
+    {
+        CreateSecondWildMon(wildMonInfo, area);
+        BattleSetup_StartOneVTwoWildBattle();
+    }
+    else if (CalculatePlayerPartyCount() >= 2)
     {
         CreateSecondWildMon(wildMonInfo, area);
         BattleSetup_StartDoubleWildBattle();
