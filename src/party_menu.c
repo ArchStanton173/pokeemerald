@@ -5766,10 +5766,14 @@ void ChooseMonForWirelessMinigame(void)
 
 static u8 GetPartyLayoutFromBattleType(void)
 {
-    if (IsDoubleBattle() == FALSE)
-        return PARTY_LAYOUT_SINGLE;
     if (IsMultiBattle() == TRUE)
         return PARTY_LAYOUT_MULTI;
+
+    // Based on pokeemerald-expansion:
+    // A double battle with one player Pokémon uses the single layout.
+    if (!IsDoubleBattle() || (gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO))
+        return PARTY_LAYOUT_SINGLE;
+
     return PARTY_LAYOUT_DOUBLE;
 }
 
@@ -5957,7 +5961,9 @@ static void BufferBattlePartyOrderBySide(u8 *partyBattleOrder, u8 flankId, u8 ba
         }
         return;
     }
-    else if (IsDoubleBattle() == FALSE)
+    else if (IsDoubleBattle() == FALSE
+      || ((gBattleTypeFlags & BATTLE_TYPE_ONE_V_TWO)
+       && GetBattlerSide(battler) == B_SIDE_PLAYER))
     {
         j = 1;
         partyIndexes[0] = gBattlerPartyIndexes[leftBattler];
