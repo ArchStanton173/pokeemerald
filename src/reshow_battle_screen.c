@@ -182,7 +182,8 @@ static void ClearBattleBgCntBaseBlocks(void)
 
 static bool8 LoadBattlerSpriteGfx(u8 battler)
 {
-    if (battler < gBattlersCount)
+    if (battler < gBattlersCount
+     && !(gAbsentBattlerFlags & (1 << battler)))
     {
         if (GetBattlerSide(battler) != B_SIDE_PLAYER)
         {
@@ -207,7 +208,8 @@ static bool8 LoadBattlerSpriteGfx(u8 battler)
 
 static void CreateBattlerSprite(u8 battler)
 {
-    if (battler < gBattlersCount)
+    if (battler < gBattlersCount
+     && !(gAbsentBattlerFlags & (1 << battler)))
     {
         u8 posY;
 
@@ -275,7 +277,8 @@ static void CreateBattlerSprite(u8 battler)
 
 static void CreateHealthboxSprite(u8 battler)
 {
-    if (battler < gBattlersCount)
+    if (battler < gBattlersCount
+     && !(gAbsentBattlerFlags & (1 << battler)))
     {
         u8 healthboxSpriteId;
 
